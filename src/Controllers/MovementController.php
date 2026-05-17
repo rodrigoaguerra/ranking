@@ -18,27 +18,27 @@ class MovementController {
      */
     public function getRanking(string $identifier, int $page = 1, int $limit = 10): string {
         try {
+            // Tratamento de entradas inválidas
+            if($limit < 1 || $limit > 100) {
+                throw new \InvalidArgumentException("Limite inválido");
+            }
+            
             // Método adicional para contar total de registros
             $total = $this->model->getTotalRankingCount($identifier); 
             $total_pages = ceil($total / $limit);
 
-            // Tratamento de erros
-            if($limit < 1 || $limit > 100) {
-                throw new \InvalidArgumentException("Limite inválido");
-            }
-
-            if($page < 1 || $page > $total_pages) {
-                throw new \InvalidArgumentException("Página inválida");
-            }
-
             // O Controller apenas pede os dados para a Model
             $data = $this->model->getRankingByIdentifier($identifier, $page, $limit);
             
-            
             // O Controller verifica se o ranking foi encontrado
-            if (!$data) {
+            if (!$data && $total_pages == 0) {
                 http_response_code(404);
                 return json_encode(["error" => "Movimento não encontrado"], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            }
+
+            // Tratamento de entradas inválidas de página
+            if($page < 1 || $page > $total_pages) {
+                throw new \InvalidArgumentException("Página inválida");
             }
 
             // O Controller formata a resposta final conforme os requisitos
