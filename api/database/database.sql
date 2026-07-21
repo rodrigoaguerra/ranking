@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS `ranking`;
+USE `ranking`;
 CREATE TABLE `user` (
 `id` int NOT NULL AUTO_INCREMENT,
 `name` varchar(255) NOT NULL,

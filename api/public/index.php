@@ -9,6 +9,7 @@ use App\Core\Container;
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $parts = array_values(array_filter(explode('/', $uri)));
 
+$api = array_shift($parts); // Remove 'api' da URI
 $route = $parts[0] ?? '';  // Ex: 'ranking'
 $parms = $parts[1] ?? null; // Permite pegar o ID ou Nome diretamente da URI, ex: /ranking/1 ou /ranking/squat
 $query = $_GET['id'] ?? $_GET['name'] ?? null; // Permite tanto ?id= quanto ?name= para flexibilidade
@@ -45,7 +46,7 @@ switch ($route) {
         break;
 
     default:
-        if ($uri === '/' || $uri === '') {
+        if ($uri === '/api' || $uri === '/api/') {
             echo json_encode([
                 "api" => APP_NAME,
                 "version" => "1.0",

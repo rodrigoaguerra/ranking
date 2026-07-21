@@ -485,7 +485,7 @@
   </div>
 
   <p class="footer">
-    API: <a href="https://api-tecnofit.rodrigoalvesguerra.com.br/ranking/" target="_blank">api-tecnofit.rodrigoalvesguerra.com.br/ranking/</a>
+    API: <a href="https://ranking.rodrigoalvesguerra.com.br/api/ranking" target="_blank">ranking.rodrigoalvesguerra.com.br/api/ranking</a>
   </p>
 
 <script>
@@ -510,7 +510,7 @@
     currentPage  = page;
     setLoading();
 
-    const url = `http://localhost:8000/api/ranking/${encodeURIComponent(q)}?page=${page}&limit=2`;
+    const url = `https://ranking.rodrigoalvesguerra.com.br/api/ranking/${encodeURIComponent(q)}?page=${page}&limit=2`;
 
     try {
       const res = await fetch(url);

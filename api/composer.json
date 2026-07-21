@@ -10,8 +10,7 @@
     ],
     "scripts": {
         "start": "php -S localhost:8000 -t public",
-        "test": "phpunit --testdox 2>&1 | tee output.log",
-        "db:import": "php database/import.php"
+        "test": "phpunit --testdox 2>&1 | tee output.log"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.0"

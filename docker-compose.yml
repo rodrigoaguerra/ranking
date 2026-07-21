@@ -1,0 +1,41 @@
+# docker-compose.yml
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ranking
+      DB_USER: root
+      DB_PASSWORD: db-docker123@
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+    # habilita mod_rewrite
+    command: >
+      bash -c "a2enmod rewrite && apache2-foreground"
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: db-docker123@
+      MYSQL_DATABASE: ranking
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./api/database/database.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-pdb-docker123@"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+
+volumes:
+  mysql_data:

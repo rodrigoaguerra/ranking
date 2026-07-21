@@ -5,10 +5,10 @@ Este projeto consiste em uma API RESTful desenvolvida em PHP puro, utilizando PD
 A aplicação tem como objetivo fornecer o ranking de um determinado movimento com base nos dados armazenados no banco, retornando as informações em formato JSON.
 
 ## 🔗 Endpoint's disponíveis
-- GET /ranking/{id}?page={pagina}&limit={numero_de_linhas}
-- GET /ranking?id={id}&?page={pagina}&limit={numero_de_linhas}
-- GET /ranking/{nome_do_movimento}?page={pagina}&limit={numero_de_linhas}
-- GET /ranking?name={nome_do_movimento}&?page={pagina}&limit={numero_de_linhas}
+- GET /api/ranking/{id}?page={pagina}&limit={numero_de_linhas}
+- GET /api/ranking?id={id}&?page={pagina}&limit={numero_de_linhas}
+- GET /api/ranking/{nome_do_movimento}?page={pagina}&limit={numero_de_linhas}
+- GET /api/ranking?name={nome_do_movimento}&?page={pagina}&limit={numero_de_linhas}
 
 Retorna o ranking de um movimento específico, podendo ser consultado pelo ID ou nome.
 
@@ -26,13 +26,15 @@ Siga os passos abaixo para instalar e configurar a api.
 ```sh
 git clone https://github.com/rodrigoaguerra/ranking.git
 ```
+
 ### 🔹 1.2 Navegar para pasta do projeto
 ```sh
-cd ranking/api
+cd ranking
 ```
 
-### 🔹 1.3 Instalar Dependências
+### 🔹 1.3 Instalar Dependências da API
 ```sh
+cd api
 composer install
 ```
 
@@ -64,27 +66,21 @@ define( 'DB_USER', 'USUARIO_DO_BANCO' );
 define( 'DB_PASSWORD', 'SENHA_DO_BANCO' );
 ```
 
-### 🔹 1.5 importar o banco de dados
+### 🔹 1.5 Iniciar o Servidor
 ```sh
-composer db:import
+docker compose up -d --build
 ```
 
-### 🔹 1.6 Iniciar o Servidor
-```sh
-cd ../
-```
-ou 
-```sh
-php -S localhost:8000 -t public
-```
-A api estará disponível em: http://localhost:8000
+> O arquivo [api/database/database.sql](api/database/database.sql) é executado automaticamente pelo container MySQL na primeira inicialização, desde que o volume do banco esteja vazio.
+
+A api estará disponível em: http://localhost:8000/api/
 
 ## 📌 2. Testar o endpoint da api
 exemplos de uso:
-  - GET http://localhost:8000/ranking/1?page=1&limit=10
-  - GET http://localhost:8000/ranking?id=2&page=1&limit=10
-  - GET http://localhost:8000/ranking/Deadlift?page=1&limit=10
-  - GET http://localhost:8000/ranking?name=Deadlift&page=1&limit=10
+  - GET http://localhost:8000/api/ranking/1?page=1&limit=10
+  - GET http://localhost:8000/api/ranking?id=2&page=1&limit=10
+  - GET http://localhost:8000/api/ranking/Deadlift?page=1&limit=10
+  - GET http://localhost:8000/api/ranking?name=Deadlift&page=1&limit=10
 
 ## 📌 3. Funcionalidades
 - ✅ Buscar ranking de movimento por id ou nome
@@ -93,5 +89,5 @@ exemplos de uso:
 Desenvolvido por [**Rodrigo Alves Guerra 🖥️🚀**](https://rodrigoalvesguerra.com.br)
 
 ## 📌 5. Demo 
-  - [api](https://ranking.rodrigoalvesguerra.com.br/api/)
+  - [api](https://ranking.rodrigoalvesguerra.com.br/api/ranking)
   - [aplicação](https://ranking.rodrigoalvesguerra.com.br)
