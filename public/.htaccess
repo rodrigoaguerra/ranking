@@ -1,14 +1,13 @@
-RewriteEngine On
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
 
-# Impede a listagem de diretórios por segurança
-Options -Indexes
+  # Se a requisição for para /api, deixa o PHP cuidar
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^api/(.*)$ api/public/index.php [QSA,L]
 
-# Define a base para o redirecionamento
-RewriteBase /
-
-# Se o arquivo ou diretório solicitado não existir fisicamente...
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-
-# ...redireciona tudo para o index.php, preservando os parâmetros (QSA)
-RewriteRule ^(.*)$ index.php [QSA,L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>

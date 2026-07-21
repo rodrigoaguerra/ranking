@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tecnofit · Ranking</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b0c0f;
+      --surface: #13151a;
+      --border: #222530;
+      --accent: #c8f135;
+      --accent-dim: rgba(200,241,53,.12);
+      --text: #e8eaf0;
+      --muted: #5a5e72;
+      --danger: #ff4f5e;
+      --radius: 6px;
+      --mono: 'DM Mono', monospace;
+      --display: 'Bebas Neue', sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 0 1.5rem 4rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* — background grid — */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(200,241,53,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,241,53,.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* — glow blob — */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -20vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60vw;
+      height: 60vw;
+      background: radial-gradient(circle, rgba(200,241,53,.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 720px;
+      padding-top: clamp(6rem, 18vh, 12rem);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .badge {
+      font-size: .65rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid rgba(200,241,53,.35);
+      padding: .35rem .85rem;
+      border-radius: 999px;
+      background: var(--accent-dim);
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-size: clamp(3.5rem, 10vw, 7rem);
+      letter-spacing: .04em;
+      line-height: .9;
+      text-align: center;
+      color: var(--text);
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .subtitle {
+      font-size: .78rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+      text-align: center;
+    }
+
+    /* ===== SEARCH ===== */
+    .search-wrap {
+      position: relative;
+      width: 100%;
+      margin-top: .5rem;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1.1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--muted);
+      pointer-events: none;
+      transition: color .2s;
+    }
+
+    #search-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: .95rem;
+      padding: 1rem 7rem 1rem 3rem;
+      border-radius: var(--radius);
+      outline: none;
+      transition: border-color .25s, box-shadow .25s;
+      letter-spacing: .03em;
+    }
+
+    #search-input::placeholder { color: var(--muted); }
+
+    #search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(200,241,53,.12);
+    }
+
+    #search-input:focus ~ .search-icon { color: var(--accent); }
+
+    #btn-search {
+      position: absolute;
+      right: .6rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--accent);
+      color: #0b0c0f;
+      border: none;
+      font-family: var(--mono);
+      font-size: .75rem;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .55rem 1.1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: opacity .2s, transform .15s;
+    }
+
+    #btn-search:hover { opacity: .88; }
+    #btn-search:active { transform: translateY(-50%) scale(.96); }
+
+    .hint {
+      font-size: .7rem;
+      color: var(--muted);
+      letter-spacing: .04em;
+      margin-top: .5rem;
+      text-align: center;
+    }
+    .hint code {
+      color: rgba(200,241,53,.65);
+      font-family: var(--mono);
+    }
+
+    /* ===== OUTPUT ===== */
+    #output {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 720px;
+      margin-top: 2.5rem;
+    }
+
+    /* — estado vazio — */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .75rem;
+      padding: 3rem 0;
+      color: var(--muted);
+      font-size: .8rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .empty-state svg { opacity: .25; }
+
+    /* — skeleton / loader — */
+    .loader {
+      display: flex;
+      gap: .4rem;
+      justify-content: center;
+      padding: 2.5rem 0;
+    }
+    .loader span {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: bounce .9s ease-in-out infinite;
+    }
+    .loader span:nth-child(2) { animation-delay: .15s; }
+    .loader span:nth-child(3) { animation-delay: .3s; }
+    @keyframes bounce {
+      0%,100% { transform: translateY(0); opacity:.4; }
+      50%      { transform: translateY(-10px); opacity:1; }
+    }
+
+    /* — error — */
+    .error-msg {
+      border: 1px solid rgba(255,79,94,.3);
+      background: rgba(255,79,94,.07);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      font-size: .82rem;
+      color: var(--danger);
+      letter-spacing: .03em;
+    }
+
+    /* — result card — */
+    .result-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      animation: slideUp .35s ease forwards;
+    }
+    @keyframes slideUp {
+      from { opacity:0; transform: translateY(14px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .75rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+    }
+    .card-header-left {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-size: .7rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .dot { width:8px; height:8px; border-radius:50%; background: var(--accent); flex-shrink:0; }
+    .card-title { color: var(--text); }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: .3rem .75rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+      flex-shrink: 0;
+    }
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .copy-btn.copied { border-color: var(--accent); color: var(--accent); }
+
+    /* — JSON viewer — */
+    .json-viewer {
+      padding: 1.25rem;
+      font-size: .82rem;
+      line-height: 1.8;
+      letter-spacing: .01em;
+      overflow-x: auto;
+      max-height: 60vh;
+      overflow-y: auto;
+      white-space: pre;
+    }
+    .json-viewer::-webkit-scrollbar { width:6px; height:6px; }
+    .json-viewer::-webkit-scrollbar-track { background: transparent; }
+    .json-viewer::-webkit-scrollbar-thumb { background: var(--border); border-radius:99px; }
+
+    .json-key    { color: #7ecfff; }
+    .json-string { color: #a8e6a0; }
+    .json-number { color: #ffb86c; }
+    .json-bool   { color: #ff79c6; }
+    .json-null   { color: var(--muted); font-style: italic; }
+    .json-punct  { color: var(--muted); }
+
+    /* — ranking table (quando for array) — */
+    .rank-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .82rem;
+    }
+    .rank-table th {
+      text-align: left;
+      padding: .6rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      font-size: .68rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-weight: 400;
+      white-space: nowrap;
+    }
+    .rank-table td {
+      padding: .7rem 1rem;
+      border-bottom: 1px solid rgba(34,37,48,.6);
+      vertical-align: middle;
+    }
+    .rank-table tr:last-child td { border-bottom: none; }
+    .rank-table tr:hover td { background: rgba(200,241,53,.03); }
+
+    .rank-pos {
+      font-family: var(--display);
+      font-size: 1.2rem;
+      color: var(--accent);
+      min-width: 2.5rem;
+    }
+    .rank-pos.gold   { color: #ffd700; }
+    .rank-pos.silver { color: #c0c0c0; }
+    .rank-pos.bronze { color: #cd7f32; }
+
+    .pill {
+      display: inline-block;
+      font-size: .65rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: .2rem .55rem;
+      border-radius: 999px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(200,241,53,.25);
+    }
+
+    /* ===== TABS ===== */
+    .tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .72rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .65rem 1.25rem;
+      cursor: pointer;
+      transition: color .2s, border-color .2s;
+      margin-bottom: -1px;
+    }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab:hover:not(.active) { color: var(--text); }
+
+    /* ===== PAGINATION ===== */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .75rem 1.25rem;
+      border-top: 1px solid var(--border);
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .pagination-info {
+      font-size: .7rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+    }
+    .pagination-info strong { color: var(--text); }
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .page-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .72rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: .4rem .9rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .page-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .page-btn:disabled { opacity: .3; cursor: not-allowed; }
+    .page-numbers { display: flex; gap: .35rem; }
+    .page-num {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .72rem;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: border-color .2s, color .2s, background .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .page-num:hover:not(.active) { border-color: rgba(200,241,53,.4); color: var(--text); }
+    .page-num.active { background: var(--accent-dim); border-color: rgba(200,241,53,.5); color: var(--accent); }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      position: relative;
+      z-index: 1;
+      margin-top: 3rem;
+      font-size: .68rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+    }
+    .footer a { color: rgba(200,241,53,.5); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <section class="hero">
+    <span class="badge">⚡ Tecnofit API</span>
+    <h1>RANK<span>ING</span></h1>
+    <p class="subtitle">Consulte posições por ID ou nome de usuário</p>
+
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input
+        id="search-input"
+        type="text"
+        placeholder="Digite um ID ou nome…"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button id="btn-search">Buscar</button>
+    </div>
+    <p class="hint">Ex.: <code>1</code> · <code>2</code> · <code>Deadlift</code> · <code>Back Squat</code></p>
+  </section>
+
+  <div id="output">
+    <div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3h18v4H3zM3 10h18v4H3zM3 17h18v4H3z"/>
+      </svg>
+      <span>Nenhuma busca realizada</span>
+    </div>
+  </div>
+
+  <p class="footer">
+    API: <a href="https://api-tecnofit.rodrigoalvesguerra.com.br/ranking/" target="_blank">api-tecnofit.rodrigoalvesguerra.com.br/ranking/</a>
+  </p>
+
+<script>
+  const input  = document.getElementById('search-input');
+  const btn    = document.getElementById('btn-search');
+  const output = document.getElementById('output');
+
+  let lastData       = null;
+  let lastPagination = null;
+  let currentTab     = 'table';
+  let currentQuery   = '';
+  let currentPage    = 1;
+
+  btn.addEventListener('click', () => doSearch(1));
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(1); });
+
+  async function doSearch(page = 1) {
+    const q = (page === 1 ? input.value.trim() : currentQuery);
+    if (!q) { input.focus(); return; }
+
+    currentQuery = q;
+    currentPage  = page;
+    setLoading();
+
+    const url = `http://localhost:8000/api/ranking/${encodeURIComponent(q)}?page=${page}&limit=2`;
+
+    try {
+      const res = await fetch(url);
+      const json = await res.json();
+      
+      if (!res.ok) throw new Error(`HTTP ${res.status} — ${json.error || res.statusText}`);
+
+      if (json.error) { renderError(json.error); return; }
+
+      // Separa pagination do restante
+      const { pagination, ...rest } = json;
+      const data = rest.data ?? (Array.isArray(json) ? json : rest);
+
+      lastData       = data;
+      lastPagination = pagination ?? null;
+      currentTab     = Array.isArray(data) ? 'table' : 'json';
+
+      render(data, q);
+    } catch (err) {
+      renderError(err.message);
+    }
+  }
+
+  function setLoading() {
+    output.innerHTML = `<div class="loader"><span></span><span></span><span></span></div>`;
+  }
+
+  function renderError(msg) {
+    output.innerHTML = `<div class="error-msg">⚠ Erro na requisição: ${escHtml(msg)}</div>`;
+  }
+
+  function render(data, query) {
+    const isArray = Array.isArray(data);
+
+    const tabs = isArray
+      ? `<div class="tabs">
+          <button class="tab ${currentTab==='table'?'active':''}" data-tab="table">Ranking</button>
+          <button class="tab ${currentTab==='json'?'active':''}"  data-tab="json">JSON</button>
+         </div>`
+      : '';
+
+    output.innerHTML = `
+      <div class="result-card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <div class="dot"></div>
+            <span class="card-title">Resultado para "${escHtml(query)}"</span>
+          </div>
+          <button class="copy-btn" id="copy-btn">Copiar JSON</button>
+        </div>
+        ${tabs}
+        <div id="card-body"></div>
+        <div id="pagination-bar"></div>
+      </div>`;
+
+    renderBody(data);
+    renderPagination(lastPagination);
+
+    document.getElementById('copy-btn').addEventListener('click', () => {
+      navigator.clipboard.writeText(JSON.stringify(lastData, null, 2)).then(() => {
+        const b = document.getElementById('copy-btn');
+        b.textContent = 'Copiado ✓';
+        b.classList.add('copied');
+        setTimeout(() => { b.textContent = 'Copiar JSON'; b.classList.remove('copied'); }, 2000);
+      });
+    });
+
+    document.querySelectorAll('.tab').forEach(t => {
+      t.addEventListener('click', () => {
+        currentTab = t.dataset.tab;
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+        renderBody(data);
+      });
+    });
+  }
+
+  function renderPagination(pg) {
+    const bar = document.getElementById('pagination-bar');
+    if (!pg || pg.total_pages <= 1) { bar.innerHTML = ''; return; }
+
+    const { current_page, total_pages, total_records, per_page } = pg;
+    const from = (current_page - 1) * per_page + 1;
+    const to   = Math.min(current_page * per_page, total_records);
+
+    // Gera números de página (max 5 visíveis)
+    let pages = [];
+    const delta = 2;
+    for (let i = Math.max(1, current_page - delta); i <= Math.min(total_pages, current_page + delta); i++) {
+      pages.push(i);
+    }
+
+    const nums = pages.map(p => `
+      <button class="page-num ${p === current_page ? 'active' : ''}" data-page="${p}">${p}</button>
+    `).join('');
+
+    bar.innerHTML = `
+      <div class="pagination">
+        <span class="pagination-info">
+          <strong>${from}–${to}</strong> de <strong>${total_records}</strong> registros
+          &nbsp;·&nbsp; página <strong>${current_page}</strong> de <strong>${total_pages}</strong>
+        </span>
+        <div class="pagination-controls">
+          <button class="page-btn" id="pg-prev" ${current_page <= 1 ? 'disabled' : ''}>
+            ← Anterior
+          </button>
+          <div class="page-numbers">${nums}</div>
+          <button class="page-btn" id="pg-next" ${current_page >= total_pages ? 'disabled' : ''}>
+            Próxima →
+          </button>
+        </div>
+      </div>`;
+
+    document.getElementById('pg-prev')
+      ?.addEventListener('click', () => doSearch(current_page - 1));
+    document.getElementById('pg-next')
+      ?.addEventListener('click', () => doSearch(current_page + 1));
+    document.querySelectorAll('.page-num')
+      .forEach(b => b.addEventListener('click', () => doSearch(+b.dataset.page)));
+  }
+
+  function renderBody(data) {
+    const body = document.getElementById('card-body');
+    const isArray = Array.isArray(data);
+
+    if (isArray && currentTab === 'table') {
+      body.innerHTML = renderTable(data);
+    } else {
+      body.innerHTML = `<pre class="json-viewer">${syntaxHighlight(data)}</pre>`;
+    }
+  }
+
+  /* ===== ranking table ===== */
+  function renderTable(arr) {
+    if (!arr.length) return `<div style="padding:2rem;text-align:center;color:var(--muted);font-size:.8rem;">Nenhum resultado encontrado.</div>`;
+
+    // collect all keys from first item
+    const keys = Object.keys(arr[0]);
+    // try to detect position/rank key
+    const posKey = keys.find(k => /pos|rank|lugar|position|colocacao|colocação/i.test(k));
+    const nameKey = keys.find(k => /nome|name|usuario|user|atleta/i.test(k));
+    const scoreKey = keys.find(k => /score|pontos|result|total|tempo|time/i.test(k));
+
+    const headers = keys.map(k => `<th>${escHtml(k)}</th>`).join('');
+
+    const rows = arr.map((item, i) => {
+      const pos = item[posKey] ?? (i + 1);
+      const posClass = pos == 1 ? 'gold' : pos == 2 ? 'silver' : pos == 3 ? 'bronze' : '';
+
+      const cells = keys.map(k => {
+        const val = item[k];
+        if (k === posKey) {
+          return `<td><span class="rank-pos ${posClass}">${escHtml(String(val))}</span></td>`;
+        }
+        if (typeof val === 'boolean') {
+          return `<td><span class="pill">${val ? 'sim' : 'não'}</span></td>`;
+        }
+        if (val === null || val === undefined) {
+          return `<td style="color:var(--muted)">—</td>`;
+        }
+        return `<td>${escHtml(String(val))}</td>`;
+      }).join('');
+
+      return `<tr>${cells}</tr>`;
+    }).join('');
+
+    return `<div style="overflow-x:auto">
+      <table class="rank-table">
+        <thead><tr>${headers}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }
+
+  /* ===== JSON syntax highlight ===== */
+  function syntaxHighlight(obj) {
+    const json = JSON.stringify(obj, null, 2);
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?|[{}\[\],:])/g, match => {
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) return `<span class="json-key">${escHtml(match)}</span>`;
+        return `<span class="json-string">${escHtml(match)}</span>`;
+      }
+      if (/true|false/.test(match)) return `<span class="json-bool">${match}</span>`;
+      if (/null/.test(match))        return `<span class="json-null">${match}</span>`;
+      if (/[{}\[\]]/.test(match))    return `<span class="json-punct">${match}</span>`;
+      if (/,|:/.test(match))         return `<span class="json-punct">${match}</span>`;
+      return `<span class="json-number">${match}</span>`;
+    });
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>

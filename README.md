@@ -24,11 +24,11 @@ Siga os passos abaixo para instalar e configurar a api.
 
 ### 🔹 1.1 Clonar o Repositório
 ```sh
-git clone https://github.com/rodrigoaguerra/tecnofit.git
+git clone https://github.com/rodrigoaguerra/ranking.git
 ```
 ### 🔹 1.2 Navegar para pasta do projeto
 ```sh
-cd tecnofit
+cd ranking/api
 ```
 
 ### 🔹 1.3 Instalar Dependências
@@ -71,7 +71,7 @@ composer db:import
 
 ### 🔹 1.6 Iniciar o Servidor
 ```sh
-composer start
+cd ../
 ```
 ou 
 ```sh
@@ -93,5 +93,5 @@ exemplos de uso:
 Desenvolvido por [**Rodrigo Alves Guerra 🖥️🚀**](https://rodrigoalvesguerra.com.br)
 
 ## 📌 5. Demo 
-  - [api em produção](https://api-tecnofit.rodrigoalvesguerra.com.br)
-  - [front-end aplicação](https://tecnofit.rodrigoalvesguerra.com.br)
+  - [api](https://ranking.rodrigoalvesguerra.com.br/api/)
+  - [aplicação](https://ranking.rodrigoalvesguerra.com.br)
